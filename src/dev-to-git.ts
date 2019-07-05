@@ -1,7 +1,7 @@
 import minimist from 'minimist'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { ArticleConfig, ArticleApi } from './dev-to-git.interface'
+import { ArticleConfig } from './dev-to-git.interface'
 import { Article } from './article'
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json'
@@ -41,8 +41,8 @@ export class DevToGit {
   public publishArticles() {
     const articles = this.readConfigFile()
     articles.forEach(articleConf => {
-      const article = new Article(articleConf, this.token)
-      article.publishArticle()
+      const article = new Article(articleConf)
+      article.publishArticle(this.token)
     })
   }
 }
