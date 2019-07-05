@@ -1,13 +1,14 @@
 [
   {
-    "title": "",
-    "description": "",
-    "published": "",
-    "urlToMainImage": "",
-    "tags": [],
-    "relativePathToArticle": "",
-    "series": "",
-    "publishUnderOrg": "",
-    "canonicalUrl": ""
+    "id": 132750,
+    "title": "Updated title",
+    "description": "Great description",
+    "published": "false",
+    "urlToMainImage": null,
+    "tags": ["typescript"],
+    "relativePathToArticle": "./test/article.md",
+    "series": null,
+    "publishUnderOrg": false,
+    "canonicalUrl": null
   }
 ]

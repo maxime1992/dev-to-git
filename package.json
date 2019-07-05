@@ -3,12 +3,15 @@
   "version": "0.0.0",
   "description": "",
   "keywords": [],
-  "main": "dist/dev-to-git.umd.js",
-  "module": "dist/dev-to-git.es5.js",
-  "typings": "dist/types/dev-to-git.d.ts",
+  "main": "bin/dev-to-git.umd.js",
+  "module": "bin/dev-to-git.es5.js",
+  "typings": "bin/types/dev-to-git.d.ts",
   "files": [
-    "dist"
+    "bin"
   ],
+  "bin": {
+    "dev-to-git": "bin/index.js"
+  },
   "author": "Maxime Robert <maxime.robert1992@gmail.com>",
   "repository": {
     "type": "git",
@@ -19,11 +22,12 @@
     "node": ">=6.0.0"
   },
   "scripts": {
+    "copy-index": "cp ./src/index.js ./bin",
     "prettier:base": "yarn run prettier \"./{src,test}/**/*.ts\" \"./**/*.{yml,md,json}\"",
     "prettier:fix": "yarn run prettier:base --write",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
-    "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "prebuild": "rimraf bin",
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src && yarn run copy-index",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
@@ -86,7 +90,10 @@
   "devDependencies": {
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
+    "@types/dotenv": "6.1.1",
+    "@types/got": "9.6.0",
     "@types/jest": "^23.3.2",
+    "@types/minimist": "1.2.0",
     "@types/node": "^10.11.0",
     "colors": "^1.3.2",
     "commitizen": "^3.0.0",
@@ -118,5 +125,10 @@
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
     "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "dotenv": "8.0.0",
+    "got": "9.6.0",
+    "minimist": "1.2.0"
   }
 }

@@ -2,3 +2,5 @@ node_modules
 docs
 dist
 coverage
+bin
+.rpt2_cache
