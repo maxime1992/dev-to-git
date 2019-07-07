@@ -44,11 +44,9 @@ Simple and from there you have control over the following properties: `title`, `
 
 ## How do I add images to my blog posts?
 
-Instead of uploading them manually on dev.to, simply put them on your git repo and within the markdown use a link like the following example:
+Instead of uploading them manually on dev.to, simply put them within your git repo and within the blog post use a relative link. Here's an example: `The following is an image: ![alt text](./assets/image.png 'Title image')`.
 
-https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/master/blog-posts/name-of-your-blog-post/assets/your-asset.png
-
-Alternatively you can use a CDN like https://gitcdn.xyz where you'd just need to paste the previous URL and use the one that website gives you.
+If you've got some plugin to preview your markdown from your IDE, the images will be correctly displayed. Then, on CI, right before they're published, the link will be updated to match the raw file.
 
 ## How to setup CI for auto deploying the blog posts?
 
