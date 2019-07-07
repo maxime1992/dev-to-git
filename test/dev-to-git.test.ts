@@ -37,36 +37,4 @@ describe(`DevToGit`, () => {
       });
     });
   });
-
-  // describe(`Article`, () => {
-  //   describe(`Read`, () => {
-  //     it(`should read an article from the configuration`, () => {
-  //       const CUSTOM_CONFIG_PATH: string = './test/dev-to-git.json'
-  //       process.argv = [
-  //         'don-t-care',
-  //         'don-t-care',
-  //         '--config',
-  //         CUSTOM_CONFIG_PATH
-  //       ]
-  //       const devToGit = new DevToGit()
-  //       expect(devToGit.readArticleOnDisk()).toContain(
-  //         'This is my awesome article!'
-  //       )
-  //       expect(devToGit.readArticleOnDisk()).toContain('Hey, some text!')
-  //     })
-  //   })
-  //   describe(`Publish`, () => {
-  //     it(`should publish the article`, () => {
-  //       const CUSTOM_CONFIG_PATH: string = './test/dev-to-git.json'
-  //       process.argv = [
-  //         'don-t-care',
-  //         'don-t-care',
-  //         '--config',
-  //         CUSTOM_CONFIG_PATH
-  //       ]
-  //       const devToGit = new DevToGit()
-  //       devToGit.publishArticle(devToGit.readConfigFile()[0])
-  //     })
-  //   })
-  // })
 });
