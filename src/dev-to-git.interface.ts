@@ -16,3 +16,22 @@ export interface ArticleConfig extends ArticleConfigFile {
 export interface ArticleApi {
   body_markdown: string;
 }
+
+export enum UpdateStatus {
+  UPDATED = 'Updated',
+  ERROR = 'Error',
+  // @todo handle that case
+  ALREADY_UP_TO_DATE = 'AlreadyUpToDate',
+  FAILED_TO_EXTRACT_FRONT_MATTER = 'FailedToExtractFrontMatter',
+}
+
+export type ArticlePublishedStatus = {
+  articleId: number;
+} & (
+  | {
+      articleTitle: string;
+      updateStatus: Exclude<UpdateStatus, UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER>;
+    }
+  | {
+      updateStatus: UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER;
+    });

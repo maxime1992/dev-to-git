@@ -1,8 +1,9 @@
 import minimist from 'minimist';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { ArticleConfig, ArticleConfigFile, Repository } from './dev-to-git.interface';
+import { ArticleConfig, ArticleConfigFile, Repository, ArticlePublishedStatus } from './dev-to-git.interface';
 import { Article } from './article';
+import { formatArticlePublishedStatuses } from './helpers';
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
@@ -67,15 +68,24 @@ export class DevToGit {
     }));
   }
 
-  public publishArticles() {
+  public publishArticles(): Promise<ArticlePublishedStatus[]> {
     const articles = this.readConfigFile();
-    articles.forEach(articleConf => {
-      const article = new Article(articleConf);
-      article.publishArticle(this.token);
-    });
+
+    return Promise.all(
+      articles.map(articleConf => {
+        const article = new Article(articleConf);
+        return article.publishArticle(this.token);
+      }),
+    );
   }
 }
 
 // @todo move to main file?
 const devToGit = new DevToGit();
-devToGit.publishArticles();
+devToGit
+  .publishArticles()
+  .then(formatArticlePublishedStatuses)
+  .then(console.log)
+  .catch(() => {
+    throw new Error(`An error occured while publishing the articles`);
+  });

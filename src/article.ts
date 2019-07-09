@@ -1,6 +1,11 @@
-import { ArticleConfig, ArticleApi } from './dev-to-git.interface';
+import { ArticleConfig, ArticleApi, ArticlePublishedStatus, UpdateStatus } from './dev-to-git.interface';
 import got from 'got';
 import fs from 'fs';
+import extractFrontMatter from 'front-matter';
+
+interface ArticleFrontMatter {
+  title: string;
+}
 
 const imagesRe: RegExp = /\!\[.*\]\(.*\)/g;
 const imageRe: RegExp = /\!\[(.*)\]\(([^ \)]*)(?: '(.*)')?\)/;
@@ -48,16 +53,47 @@ export class Article {
     return this.updateLocalImageLinks(article);
   }
 
-  public publishArticle(token: string): got.GotPromise<any> {
+  public publishArticle(token: string): Promise<ArticlePublishedStatus> {
     const body: ArticleApi = {
       body_markdown: this.readArticleOnDisk(),
     };
+
+    let frontMatter: ArticleFrontMatter;
+
+    try {
+      frontMatter = this.extractDataFromFrontMatter(body.body_markdown);
+    } catch {
+      return Promise.resolve({
+        articleId: this.articleConfig.id,
+        updateStatus: UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER as UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER,
+      });
+    }
 
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
       json: true,
       method: 'PUT',
       headers: { 'api-key': token },
       body,
-    });
+    })
+      .then(() => ({
+        articleId: this.articleConfig.id,
+        articleTitle: frontMatter.title,
+        updateStatus: UpdateStatus.UPDATED as UpdateStatus.UPDATED,
+      }))
+      .catch(() => ({
+        articleId: this.articleConfig.id,
+        articleTitle: frontMatter.title,
+        updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
+      }));
+  }
+
+  private extractDataFromFrontMatter(textArticle: string): ArticleFrontMatter {
+    const frontMatter = extractFrontMatter<ArticleFrontMatter>(textArticle);
+
+    if (!frontMatter || !frontMatter.attributes || !frontMatter.attributes.title) {
+      throw new Error(`The article doesn't have a valid front matter`);
+    }
+
+    return { title: frontMatter.attributes.title };
   }
 }
