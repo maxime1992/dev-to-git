@@ -4,3 +4,4 @@ dist
 coverage
 bin
 .rpt2_cache
+.idea

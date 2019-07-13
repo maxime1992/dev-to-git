@@ -1,4 +1,4 @@
-import { ArticlePublishedStatus, UpdateStatus } from './dev-to-git.interface';
+import { ArticlePublishedStatus, ConfigurationOptions, UpdateStatus } from './dev-to-git.interface';
 
 export const formatArticlePublishedStatuses = (articlePublishedStatuses: ArticlePublishedStatus[]): string => {
   return articlePublishedStatuses
@@ -33,3 +33,11 @@ class UnreachabelCase {
   // tslint:disable-next-line:no-empty
   constructor(payload: never) {}
 }
+
+export type Logger = (...messages: string[]) => void;
+
+export const logBuilder = (options: ConfigurationOptions): Logger => (...messages: string[]) => {
+  if (!options.silent) {
+    console.log(...messages);
+  }
+};
