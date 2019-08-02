@@ -7,7 +7,7 @@ interface ArticleFrontMatter {
   title: string;
 }
 
-const imagesRe: RegExp = /\!\[.*\]\(.*\)/g;
+const imagesRe: RegExp = /\!\[.*\]\(\.\/.*\)/g;
 const imageRe: RegExp = /\!\[(.*)\]\(([^ \)]*)(?: '(.*)')?\)/;
 
 const excludeArticleFromPath = (path: string): string => path.replace(/\/[^\/]+\.md$/, '');
