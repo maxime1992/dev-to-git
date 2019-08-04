@@ -21,9 +21,10 @@ export class Article {
   constructor(private articleConfig: ArticleConfig) {}
 
   private updateLocalImageLinks(article: string): string {
-    let searchImageResult,
-      localImagesToReplace: ImageToReplace[] = [];
+    let searchImageResult;
+    let localImagesToReplace: ImageToReplace[] = [];
 
+    // tslint:disable-next-line: no-conditional-assignment
     while ((searchImageResult = imagesRe.exec(article))) {
       const [image] = searchImageResult;
 
@@ -53,7 +54,14 @@ export class Article {
     return this.updateLocalImageLinks(article);
   }
 
-  public publishArticle(token: string): Promise<ArticlePublishedStatus> {
+  private fetchArticleBodyMarkdown(articleId: number): Promise<string | null> {
+    return got(`https://dev.to/api/articles/${articleId}`, {
+      json: true,
+      method: 'GET',
+    }).then((x: got.Response<ArticleApi>) => x.body.body_markdown);
+  }
+
+  public async publishArticle(token: string): Promise<ArticlePublishedStatus> {
     const body: ArticleApi = {
       body_markdown: this.readArticleOnDisk(),
     };
@@ -69,6 +77,27 @@ export class Article {
       });
     }
 
+    let remoteArticleBodyMarkdown: string | null;
+
+    try {
+      remoteArticleBodyMarkdown = await this.fetchArticleBodyMarkdown(this.articleConfig.id);
+    } catch (error) {
+      return {
+        updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
+        articleId: this.articleConfig.id,
+        articleTitle: frontMatter.title,
+        error,
+      };
+    }
+
+    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
+      return {
+        articleId: this.articleConfig.id,
+        updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
+        articleTitle: frontMatter.title,
+      };
+    }
+
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
       json: true,
       method: 'PUT',
@@ -80,10 +109,11 @@ export class Article {
         articleTitle: frontMatter.title,
         updateStatus: UpdateStatus.UPDATED as UpdateStatus.UPDATED,
       }))
-      .catch(() => ({
+      .catch(error => ({
         articleId: this.articleConfig.id,
         articleTitle: frontMatter.title,
         updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
+        error,
       }));
   }
 
