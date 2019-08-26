@@ -123,9 +123,10 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.20.0",
     "dotenv": "8.0.0",
     "front-matter": "3.0.2",
-    "got": "9.6.0",
-    "minimist": "1.2.0"
+    "got": "9.6.0"
   }
 }

@@ -25,6 +25,13 @@ export enum UpdateStatus {
   FAILED_TO_EXTRACT_FRONT_MATTER = 'FailedToExtractFrontMatter',
 }
 
+export interface ConfigurationOptions {
+  silent: boolean;
+  config: string; // the config file path
+  devToToken: string;
+  repository: Repository;
+}
+
 export type ArticlePublishedStatus = {
   articleId: number;
 } & (

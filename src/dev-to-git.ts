@@ -1,58 +1,94 @@
-import minimist from 'minimist';
-import fs from 'fs';
+import chalk from 'chalk';
+import program from 'commander';
 import dotenv from 'dotenv';
-import { ArticleConfig, ArticleConfigFile, Repository, ArticlePublishedStatus } from './dev-to-git.interface';
+import fs from 'fs';
 import { Article } from './article';
-import { formatArticlePublishedStatuses } from './helpers';
+import {
+  ArticleConfig,
+  ArticleConfigFile,
+  ArticlePublishedStatus,
+  ConfigurationOptions,
+  Repository,
+} from './dev-to-git.interface';
+import { formatArticlePublishedStatuses, logBuilder, Logger } from './helpers';
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
 const repositoryRe: RegExp = /.*\/(.*)\/(.*)\.git/;
 
 export class DevToGit {
-  private configPath: string = DEFAULT_CONFIG_PATH;
-  private token: string = '';
-  private repository: Repository = { username: '', name: '' };
+  private configuration: ConfigurationOptions;
+
+  public logger: Logger;
 
   constructor() {
     dotenv.config();
 
-    const { config } = minimist(process.argv.slice(2));
+    const pkg = require('../package.json');
 
-    if (config && typeof config === 'string') {
-      this.configPath = config;
+    program
+      .version(pkg.version)
+      .arguments('[...files]')
+      .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
+      .option(
+        '--dev-to-token <token>',
+        'Token for publishing to dev.to',
+        userValue => userValue || process.env.DEV_TO_GIT_TOKEN,
+      )
+      .option('--repository-url <url>', 'Url of your repository you keep your articles in.')
+      .option('--silent', `No console output`)
+      .parse(process.argv);
+
+    const configuration: ConfigurationOptions = (program as unknown) as ConfigurationOptions;
+    this.configuration = configuration;
+
+    this.logger = logBuilder(this.configuration);
+
+    this.configuration.repository = this.parseRepository(program.repositoryUrl) || this.extractRepository();
+
+    if (!this.configuration.devToToken) {
+      this.logger(chalk.red('DEV_TO_GIT_TOKEN environment variable, or --dev-to-token argument is required'));
+      process.exit(1);
     }
-
-    this.extractRepository();
-
-    if (!process.env.DEV_TO_GIT_TOKEN) {
-      throw new Error('Token is required');
-    }
-
-    this.token = process.env.DEV_TO_GIT_TOKEN;
   }
 
-  private extractRepository(): void {
+  private parseRepository(repo: string): Repository | null {
+    const match = repo.match(repositoryRe);
+
+    if (!match) {
+      return null;
+    }
+
+    return {
+      username: match![1],
+      name: match![2],
+    };
+  }
+
+  private extractRepository(): Repository {
     try {
       const packageJson = JSON.parse(fs.readFileSync('./package.json').toString());
 
-      const matchRepositoryUrl = (packageJson.repository.url as string).match(repositoryRe);
+      const repo = this.parseRepository(packageJson.repository.url);
 
-      if (matchRepositoryUrl) {
-        const [_, username, name] = matchRepositoryUrl;
-        this.repository = { username, name };
-      } else {
-        throw new Error();
+      if (!repo) {
+        throw Error();
       }
+
+      return repo;
     } catch (error) {
-      throw new Error(
-        'You must have within your "package.json" a "repository" attribute which is an object and contains itself an attribute "url" like the following: https://github-gitlab-whatever.com/username/repository-name.git - this will be used to generate images links if necessary',
+      this.logger(
+        chalk.red(
+          'If you do not specify --repository-url, you must have within your "package.json" a "repository" attribute which is an object and contains itself an attribute "url" like the following: https://github-gitlab-whatever.com/username/repository-name.git - this will be used to generate images links if necessary',
+        ),
       );
+      process.exit(1);
     }
+    throw new Error('Should not be reached');
   }
 
   public getConfigPath(): string {
-    return this.configPath;
+    return this.configuration.config;
   }
 
   public readConfigFile(): ArticleConfig[] {
@@ -64,7 +100,7 @@ export class DevToGit {
 
     return articleConfigFiles.map(articleConfigFile => ({
       ...articleConfigFile,
-      repository: this.repository,
+      repository: this.configuration.repository,
     }));
   }
 
@@ -74,7 +110,7 @@ export class DevToGit {
     return Promise.all(
       articles.map(articleConf => {
         const article = new Article(articleConf);
-        return article.publishArticle(this.token);
+        return article.publishArticle(this.configuration.devToToken);
       }),
     );
   }
@@ -85,7 +121,9 @@ const devToGit = new DevToGit();
 devToGit
   .publishArticles()
   .then(formatArticlePublishedStatuses)
-  .then(console.log)
-  .catch(() => {
-    throw new Error(`An error occured while publishing the articles`);
+  .then(statuses => devToGit.logger(statuses))
+  .catch(err => {
+    devToGit.logger(chalk.red(`An error occurred while publishing the articles`));
+    console.error(err);
+    process.exit(1);
   });
