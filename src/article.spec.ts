@@ -39,5 +39,9 @@ describe(`Article`, () => {
         `Image 3: ![alt text 3](https://raw.githubusercontent.com/${repository.username}/${repository.name}/master/test/image-3.png)`,
       );
     });
+
+    it(`should NOT rewrite absolute images URLs to match the raw file on github`, () => {
+      expect(articleRead).toContain(`Absolute image: ![alt text](http://google.com/absolute-image.png)`);
+    });
   });
 });
