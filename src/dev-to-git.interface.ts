@@ -19,9 +19,8 @@ export interface ArticleApi {
 
 export enum UpdateStatus {
   UPDATED = 'Updated',
-  ERROR = 'Error',
-  // @todo handle that case
   ALREADY_UP_TO_DATE = 'AlreadyUpToDate',
+  ERROR = 'Error',
   FAILED_TO_EXTRACT_FRONT_MATTER = 'FailedToExtractFrontMatter',
 }
 
@@ -36,9 +35,14 @@ export type ArticlePublishedStatus = {
   articleId: number;
 } & (
   | {
-      articleTitle: string;
-      updateStatus: Exclude<UpdateStatus, UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER>;
+      updateStatus: UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER;
     }
   | {
-      updateStatus: UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER;
+      articleTitle: string;
+      updateStatus: Exclude<UpdateStatus, UpdateStatus.ERROR | UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER>;
+    }
+  | {
+      articleTitle: string;
+      updateStatus: UpdateStatus.ERROR;
+      error: Error;
     });

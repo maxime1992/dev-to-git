@@ -10,18 +10,22 @@ export const formatArticlePublishedStatuses = (articlePublishedStatuses: Article
       let text: string = `Article "${articleStatus.articleTitle}" `;
 
       switch (articleStatus.updateStatus) {
-        case UpdateStatus.ALREADY_UP_TO_DATE:
+        case UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE:
           text += `is already up to date`;
           break;
-        case UpdateStatus.ERROR:
-          text += `encountered an error while updating`;
+        case UpdateStatus.ERROR as UpdateStatus.ERROR:
+          text +=
+            `encountered an error:\n` +
+            `Error name: "${articleStatus.error.name}"\n` +
+            `Error message: "${articleStatus.error.message}"\n` +
+            `Error stack: "${articleStatus.error.stack}"`;
           break;
-        case UpdateStatus.UPDATED:
+        case UpdateStatus.UPDATED as UpdateStatus.UPDATED:
           text += `has been successfully updated`;
           break;
 
         default:
-          throw new UnreachabelCase(articleStatus.updateStatus);
+          throw new UnreachabelCase(articleStatus);
       }
 
       return text;
