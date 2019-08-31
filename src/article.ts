@@ -80,25 +80,28 @@ export class Article {
 
     let remoteArticleBodyMarkdown: string | null;
 
-    try {
-      remoteArticleBodyMarkdown = await this.fetchArticleBodyMarkdown(this.articleConfig.id);
-    } catch (error) {
-      return {
-        updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
-        articleId: this.articleConfig.id,
-        articleTitle: frontMatter.title,
-        error,
-        published: frontMatter.published,
-      };
-    }
+    // if it's a draft, the article cannot be fetched so we just re-publish drafts
+    if (frontMatter.published) {
+      try {
+        remoteArticleBodyMarkdown = await this.fetchArticleBodyMarkdown(this.articleConfig.id);
+      } catch (error) {
+        return {
+          updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
+          articleId: this.articleConfig.id,
+          articleTitle: frontMatter.title,
+          error,
+          published: frontMatter.published,
+        };
+      }
 
-    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
-      return {
-        articleId: this.articleConfig.id,
-        updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
-        articleTitle: frontMatter.title,
-        published: frontMatter.published,
-      };
+      if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
+        return {
+          articleId: this.articleConfig.id,
+          updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
+          articleTitle: frontMatter.title,
+          published: frontMatter.published,
+        };
+      }
     }
 
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
