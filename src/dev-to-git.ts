@@ -49,7 +49,11 @@ export class DevToGit {
     }
   }
 
-  private parseRepository(repo: string): Repository | null {
+  private parseRepository(repo: string | null): Repository | null {
+    if (!repo) {
+      return null;
+    }
+
     const match = repo.match(repositoryRe);
 
     if (!match) {
