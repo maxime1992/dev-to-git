@@ -37,12 +37,12 @@ export type ArticlePublishedStatus = {
   | {
       updateStatus: UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER;
     }
-  | {
-      articleTitle: string;
-      updateStatus: Exclude<UpdateStatus, UpdateStatus.ERROR | UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER>;
-    }
-  | {
-      articleTitle: string;
-      updateStatus: UpdateStatus.ERROR;
-      error: Error;
-    });
+  | ({ articleTitle: string; published: boolean } & (
+      | {
+          updateStatus: Exclude<UpdateStatus, UpdateStatus.ERROR | UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER>;
+        }
+      | {
+          updateStatus: UpdateStatus.ERROR;
+          error: Error;
+        }
+    )));

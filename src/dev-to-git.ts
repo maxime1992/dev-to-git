@@ -31,11 +31,7 @@ export class DevToGit {
       .version(pkg.version)
       .arguments('[...files]')
       .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
-      .option(
-        '--dev-to-token <token>',
-        'Token for publishing to dev.to',
-        userValue => userValue || process.env.DEV_TO_GIT_TOKEN,
-      )
+      .option('--dev-to-token <token>', 'Token for publishing to dev.to', process.env.DEV_TO_GIT_TOKEN)
       .option('--repository-url <url>', 'Url of your repository you keep your articles in.')
       .option('--silent', `No console output`)
       .parse(process.argv);
@@ -53,7 +49,11 @@ export class DevToGit {
     }
   }
 
-  private parseRepository(repo: string): Repository | null {
+  private parseRepository(repo: string | null): Repository | null {
+    if (!repo) {
+      return null;
+    }
+
     const match = repo.match(repositoryRe);
 
     if (!match) {

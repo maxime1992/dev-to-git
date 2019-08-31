@@ -5,6 +5,7 @@ import extractFrontMatter from 'front-matter';
 
 interface ArticleFrontMatter {
   title: string;
+  published: boolean;
 }
 
 const imagesRe: RegExp = /\!\[.*\]\(\.\/.*\)/g;
@@ -79,23 +80,28 @@ export class Article {
 
     let remoteArticleBodyMarkdown: string | null;
 
-    try {
-      remoteArticleBodyMarkdown = await this.fetchArticleBodyMarkdown(this.articleConfig.id);
-    } catch (error) {
-      return {
-        updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
-        articleId: this.articleConfig.id,
-        articleTitle: frontMatter.title,
-        error,
-      };
-    }
+    // if it's a draft, the article cannot be fetched so we just re-publish drafts
+    if (frontMatter.published) {
+      try {
+        remoteArticleBodyMarkdown = await this.fetchArticleBodyMarkdown(this.articleConfig.id);
+      } catch (error) {
+        return {
+          updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
+          articleId: this.articleConfig.id,
+          articleTitle: frontMatter.title,
+          error,
+          published: frontMatter.published,
+        };
+      }
 
-    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
-      return {
-        articleId: this.articleConfig.id,
-        updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
-        articleTitle: frontMatter.title,
-      };
+      if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
+        return {
+          articleId: this.articleConfig.id,
+          updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
+          articleTitle: frontMatter.title,
+          published: frontMatter.published,
+        };
+      }
     }
 
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
@@ -108,12 +114,14 @@ export class Article {
         articleId: this.articleConfig.id,
         articleTitle: frontMatter.title,
         updateStatus: UpdateStatus.UPDATED as UpdateStatus.UPDATED,
+        published: frontMatter.published,
       }))
       .catch(error => ({
         articleId: this.articleConfig.id,
         articleTitle: frontMatter.title,
         updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
         error,
+        published: frontMatter.published,
       }));
   }
 
@@ -124,6 +132,6 @@ export class Article {
       throw new Error(`The article doesn't have a valid front matter`);
     }
 
-    return { title: frontMatter.attributes.title };
+    return { title: frontMatter.attributes.title, published: frontMatter.attributes.published || false };
   }
 }
