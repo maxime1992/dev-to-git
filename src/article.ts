@@ -1,4 +1,10 @@
-import { ArticleConfig, ArticleApi, ArticlePublishedStatus, UpdateStatus } from './dev-to-git.interface';
+import {
+  ArticleConfig,
+  ArticleApi,
+  ArticlePublishedStatus,
+  UpdateStatus,
+  ArticleApiResponse,
+} from './dev-to-git.interface';
 import got from 'got';
 import fs from 'fs';
 import extractFrontMatter from 'front-matter';
@@ -19,7 +25,24 @@ interface ImageToReplace {
 }
 
 export class Article {
-  constructor(private articleConfig: ArticleConfig) {}
+  // dev.to API returns a maximum of 1000 articles but would by default return only 30
+  // https://docs.dev.to/api/#tag/articles/paths/~1articles~1me~1all/get
+  // instead of having to manage the pagination I think it's safe to assume people using
+  // dev-to-git won't have more than 1000 articles for now
+  // also note that we're using a property instead of a method here so that the result is
+  // shared/reused for all the different articles with only 1 HTTP call
+  private articles: Promise<Record<number, string>> = got(`https://dev.to/api/articles/me/all?per_page=1000`, {
+    json: true,
+    method: 'GET',
+    headers: { 'api-key': this.token },
+  }).then((res: got.Response<ArticleApiResponse[]>) =>
+    res.body.reduce<Record<number, string>>((articlesMap, article) => {
+      articlesMap[article.id] = article.body_markdown;
+      return articlesMap;
+    }, {}),
+  );
+
+  constructor(private articleConfig: ArticleConfig, private token: string) {}
 
   private updateLocalImageLinks(article: string): string {
     let searchImageResult;
@@ -55,14 +78,7 @@ export class Article {
     return this.updateLocalImageLinks(article);
   }
 
-  private fetchArticleBodyMarkdown(articleId: number): Promise<string | null> {
-    return got(`https://dev.to/api/articles/${articleId}`, {
-      json: true,
-      method: 'GET',
-    }).then((x: got.Response<ArticleApi>) => x.body.body_markdown);
-  }
-
-  public async publishArticle(token: string): Promise<ArticlePublishedStatus> {
+  public async publishArticle(): Promise<ArticlePublishedStatus> {
     const body: ArticleApi = {
       body_markdown: this.readArticleOnDisk(),
     };
@@ -80,34 +96,36 @@ export class Article {
 
     let remoteArticleBodyMarkdown: string | null;
 
-    // if it's a draft, the article cannot be fetched so we just re-publish drafts
-    if (frontMatter.published) {
-      try {
-        remoteArticleBodyMarkdown = await this.fetchArticleBodyMarkdown(this.articleConfig.id);
-      } catch (error) {
-        return {
-          updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
-          articleId: this.articleConfig.id,
-          articleTitle: frontMatter.title,
-          error,
-          published: frontMatter.published,
-        };
-      }
+    try {
+      const articles: Record<number, string> = await this.articles;
+      remoteArticleBodyMarkdown = articles[this.articleConfig.id];
 
-      if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
-        return {
-          articleId: this.articleConfig.id,
-          updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
-          articleTitle: frontMatter.title,
-          published: frontMatter.published,
-        };
+      if (!remoteArticleBodyMarkdown) {
+        throw new Error();
       }
+    } catch (error) {
+      return {
+        updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
+        articleId: this.articleConfig.id,
+        articleTitle: frontMatter.title,
+        error,
+        published: frontMatter.published,
+      };
+    }
+
+    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
+      return {
+        articleId: this.articleConfig.id,
+        updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
+        articleTitle: frontMatter.title,
+        published: frontMatter.published,
+      };
     }
 
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
       json: true,
       method: 'PUT',
-      headers: { 'api-key': token },
+      headers: { 'api-key': this.token },
       body,
     })
       .then(() => ({

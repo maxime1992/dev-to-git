@@ -7,11 +7,14 @@ describe(`Article`, () => {
   const relativePathToArticle = `./test/article.md`;
 
   beforeEach(() => {
-    article = new Article({
-      id: 0,
-      relativePathToArticle,
-      repository,
-    });
+    article = new Article(
+      {
+        id: 0,
+        relativePathToArticle,
+        repository,
+      },
+      'private-dev-to-token',
+    );
   });
 
   describe(`Read`, () => {

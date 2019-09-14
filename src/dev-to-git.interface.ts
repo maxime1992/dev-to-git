@@ -17,6 +17,11 @@ export interface ArticleApi {
   body_markdown: string;
 }
 
+export interface ArticleApiResponse {
+  id: number;
+  body_markdown: string;
+}
+
 export enum UpdateStatus {
   UPDATED = 'Updated',
   ALREADY_UP_TO_DATE = 'AlreadyUpToDate',

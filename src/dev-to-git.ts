@@ -110,8 +110,8 @@ export class DevToGit {
 
     return Promise.all(
       articles.map(articleConf => {
-        const article = new Article(articleConf);
-        return article.publishArticle(this.configuration.devToToken);
+        const article = new Article(articleConf, this.configuration.devToToken);
+        return article.publishArticle();
       }),
     );
   }
