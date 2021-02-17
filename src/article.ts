@@ -79,14 +79,13 @@ export class Article {
   }
 
   public async publishArticle(): Promise<ArticlePublishedStatus> {
-    const body: ArticleApi = {
-      body_markdown: this.readArticleOnDisk(),
-    };
-
+    const articleFromDisk = this.readArticleOnDisk();
     let frontMatter: ArticleFrontMatter;
-
+    let body_markdown;
     try {
-      frontMatter = this.extractDataFromFrontMatter(body.body_markdown);
+      const extraction = this.extractDataFromFrontMatter(articleFromDisk);
+      frontMatter = extraction.attributes;
+      body_markdown = extraction.body;
     } catch {
       return Promise.resolve({
         articleId: this.articleConfig.id,
@@ -112,8 +111,7 @@ export class Article {
         published: frontMatter.published,
       };
     }
-
-    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
+    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body_markdown.trim()) {
       return {
         articleId: this.articleConfig.id,
         updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,
@@ -121,7 +119,12 @@ export class Article {
         published: frontMatter.published,
       };
     }
-
+    const body = {
+      article: {
+        ...frontMatter,
+        body_markdown,
+      },
+    };
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
       json: true,
       method: 'PUT',
@@ -143,13 +146,15 @@ export class Article {
       }));
   }
 
-  private extractDataFromFrontMatter(textArticle: string): ArticleFrontMatter {
-    const frontMatter = extractFrontMatter<ArticleFrontMatter>(textArticle);
+  private extractDataFromFrontMatter(textArticle: string) {
+    const extraction = extractFrontMatter<ArticleFrontMatter>(textArticle);
 
-    if (!frontMatter || !frontMatter.attributes || !frontMatter.attributes.title) {
+    if (!extraction || !extraction.attributes || !extraction.attributes.title) {
       throw new Error(`The article doesn't have a valid front matter`);
     }
-
-    return { title: frontMatter.attributes.title, published: frontMatter.attributes.published || false };
+    if (typeof extraction.attributes.published !== 'boolean') {
+      extraction.attributes.published = false;
+    }
+    return extraction;
   }
 }

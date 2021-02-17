@@ -22,7 +22,7 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "copy-index": "cp ./src/index.js ./bin",
+    "copy-index": "cp ./src/index.js ./bin && chmod +x ./bin/index.js",
     "prettier:base": "yarn run prettier \"./{src,test}/**/*.ts\" \"./**/*.{yml,md,json}\"",
     "prettier:fix": "yarn run prettier:base --write",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
