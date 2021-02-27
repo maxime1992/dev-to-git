@@ -81,7 +81,7 @@ export class Article {
   public async publishArticle(): Promise<ArticlePublishedStatus> {
     const articleFromDisk: string = this.readArticleOnDisk();
     let frontMatter: ArticleFrontMatter;
-    let body_markdown;
+    let body_markdown: string | undefined;
     try {
       const extraction = this.extractDataFromFrontMatter(articleFromDisk);
       frontMatter = extraction.attributes;
