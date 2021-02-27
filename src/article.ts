@@ -79,7 +79,7 @@ export class Article {
   }
 
   public async publishArticle(): Promise<ArticlePublishedStatus> {
-    const articleFromDisk = this.readArticleOnDisk();
+    const articleFromDisk: string = this.readArticleOnDisk();
     let frontMatter: ArticleFrontMatter;
     let body_markdown;
     try {
