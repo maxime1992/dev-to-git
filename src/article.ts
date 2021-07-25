@@ -80,13 +80,13 @@ export class Article {
 
   public async publishArticle(): Promise<ArticlePublishedStatus> {
     const body: ArticleApi = {
-      body_markdown: this.readArticleOnDisk(),
+      article: { body_markdown: this.readArticleOnDisk() },
     };
 
     let frontMatter: ArticleFrontMatter;
 
     try {
-      frontMatter = this.extractDataFromFrontMatter(body.body_markdown);
+      frontMatter = this.extractDataFromFrontMatter(body.article.body_markdown);
     } catch {
       return Promise.resolve({
         articleId: this.articleConfig.id,
@@ -113,7 +113,7 @@ export class Article {
       };
     }
 
-    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.body_markdown.trim()) {
+    if (remoteArticleBodyMarkdown && remoteArticleBodyMarkdown.trim() === body.article.body_markdown.trim()) {
       return {
         articleId: this.articleConfig.id,
         updateStatus: UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE,

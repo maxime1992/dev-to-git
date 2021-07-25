@@ -13,8 +13,11 @@ export interface ArticleConfig extends ArticleConfigFile {
 }
 
 // https://dev.to/api#available-json-parameters
+// new Dev.to update parameters https://docs.forem.com/api/#operation/updateArticle
 export interface ArticleApi {
-  body_markdown: string;
+  article: {
+    body_markdown: string;
+  };
 }
 
 export interface ArticleApiResponse {
