@@ -1,8 +1,8 @@
 {
   "name": "dev-to-git",
   "version": "0.0.0-development",
-  "description": "",
-  "keywords": [],
+  "description": "A CLI to keep your dev.to posts in sync from a GIT project, using the CI provider of your choice",
+  "keywords": ["dev.to"],
   "main": "bin/dev-to-git.umd.js",
   "module": "bin/dev-to-git.es5.js",
   "typings": "bin/types/dev-to-git.d.ts",

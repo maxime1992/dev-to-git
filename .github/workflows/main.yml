@@ -26,8 +26,8 @@ jobs:
         run: yarn prettier:check
       - name: Build lib
         run: yarn build
-      - name: Copy README & LICENCE into bin
-        run: cp README.md LICENSE bin
+      - name: Copy necessary files into bin
+        run: cp package.json README.md LICENSE bin
       - name: Deploy documentation
         if: contains('refs/heads/master', github.ref)
         env:
