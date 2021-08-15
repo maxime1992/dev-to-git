@@ -5,3 +5,4 @@ coverage
 bin
 .rpt2_cache
 .idea
+.history

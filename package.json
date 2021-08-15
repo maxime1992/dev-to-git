@@ -25,6 +25,7 @@
     "copy-index": "cp ./src/index.js ./bin",
     "prettier:base": "yarn run prettier \"./{src,test}/**/*.ts\" \"./**/*.{yml,md,json}\"",
     "prettier:fix": "yarn run prettier:base --write",
+    "prettier:check": "yarn run prettier:base --check",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf bin",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src && yarn run copy-index",
@@ -37,8 +38,7 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-    "precommit": "lint-staged",
-    "travis-deploy-once": "travis-deploy-once"
+    "precommit": "lint-staged"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -113,7 +113,6 @@
     "rollup-plugin-typescript2": "^0.18.0",
     "semantic-release": "^15.13.18",
     "shelljs": "^0.8.3",
-    "travis-deploy-once": "^5.0.9",
     "ts-jest": "^23.10.2",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
