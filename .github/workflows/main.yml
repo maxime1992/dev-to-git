@@ -1,0 +1,41 @@
+# GitHub Actions docs
+# https://help.github.com/en/articles/about-github-actions
+# https://help.github.com/en/articles/workflow-syntax-for-github-actions
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    # Machine environment:
+    # https://help.github.com/en/articles/software-in-virtual-environments-for-github-actions#ubuntu-1804-lts
+    # We specify the Node.js version manually below
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 12.8
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.8
+      - name: Install dependencies
+        run: yarn --frozen-lockfile --non-interactive --no-progress
+      - name: Lint check
+        run: yarn lint
+      - name: Format check
+        run: yarn prettier:check
+      - name: Build lib
+        run: yarn build
+      - name: Copy README & LICENCE into bin
+        run: cp README.md LICENSE bin
+      - name: Deploy documentation
+        if: contains('refs/heads/master', github.ref)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn deploy-docs
+      - name: Release
+        if: contains('refs/heads/master', github.ref)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn semantic-release
