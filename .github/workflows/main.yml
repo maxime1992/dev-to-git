@@ -35,6 +35,4 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: yarn semantic-release
       - name: Temporary
-        run: ls .
-        run: ls ./bin
-
+        run: echo "Current folder" && ls . && echo "Bin folder" && ls ./bin
