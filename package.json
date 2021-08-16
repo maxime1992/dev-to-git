@@ -9,7 +9,7 @@
   "module": "./dev-to-git.es5.js",
   "typings": "./types/dev-to-git.d.ts",
   "files": [
-    "bin"
+    "."
   ],
   "bin": {
     "dev-to-git": "./index.js"
