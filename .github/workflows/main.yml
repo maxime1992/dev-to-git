@@ -29,8 +29,7 @@ jobs:
       - name: Copy necessary files into bin
         run: cp package.json README.md LICENSE bin
       - name: Release
-        if: contains('refs/heads/master', github.ref)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn semantic-release
+        run: ls && ls bin && yarn semantic-release --dry-run
