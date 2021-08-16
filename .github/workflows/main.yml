@@ -28,11 +28,6 @@ jobs:
         run: yarn build
       - name: Copy necessary files into bin
         run: cp package.json README.md LICENSE bin
-      - name: Deploy documentation
-        if: contains('refs/heads/master', github.ref)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: yarn deploy-docs
       - name: Release
         if: contains('refs/heads/master', github.ref)
         env:
