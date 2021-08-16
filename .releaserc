@@ -6,7 +6,6 @@
     [
       "@semantic-release/npm",
       {
-        "pkgRoot": "bin",
         "npmPublish": true,
         "tarballDir": "."
       }
@@ -14,7 +13,7 @@
     [
       "@semantic-release/github",
       {
-        "assets": "bin"
+        "assets": "*.tgz"
       }
     ]
   ]
