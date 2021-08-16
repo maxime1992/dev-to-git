@@ -5,14 +5,14 @@
   "keywords": [
     "dev.to"
   ],
-  "main": "bin/dev-to-git.umd.js",
-  "module": "bin/dev-to-git.es5.js",
-  "typings": "bin/types/dev-to-git.d.ts",
+  "main": "./dev-to-git.umd.js",
+  "module": "./dev-to-git.es5.js",
+  "typings": "./types/dev-to-git.d.ts",
   "files": [
     "bin"
   ],
   "bin": {
-    "dev-to-git": "bin/index.js"
+    "dev-to-git": "./index.js"
   },
   "author": "Maxime Robert <maxime.robert1992@gmail.com>",
   "repository": {
