@@ -100,8 +100,8 @@ export class Article {
       const articles: Record<number, string> = await this.articles;
       remoteArticleBodyMarkdown = articles[this.articleConfig.id];
 
-      if (!remoteArticleBodyMarkdown) {
-        throw new Error();
+      if (remoteArticleBodyMarkdown === null) {
+        throw new Error(`Remote article body with id ${this.articleConfig.id} has not been found`);
       }
     } catch (error) {
       return {
