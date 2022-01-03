@@ -94,13 +94,13 @@ export class Article {
       });
     }
 
-    let remoteArticleBodyMarkdown: string | null;
+    let remoteArticleBodyMarkdown: string | null | undefined;
 
     try {
       const articles: Record<number, string> = await this.articles;
-      remoteArticleBodyMarkdown = articles[this.articleConfig.id];
+      remoteArticleBodyMarkdown = articles[this.articleConfig.id] as string | null | undefined;
 
-      if (remoteArticleBodyMarkdown === null) {
+      if (remoteArticleBodyMarkdown === null || remoteArticleBodyMarkdown === undefined) {
         throw new Error(`Remote article body with id ${this.articleConfig.id} has not been found`);
       }
     } catch (error) {
