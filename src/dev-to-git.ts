@@ -108,8 +108,8 @@ export class DevToGit {
   public async publishArticles(): Promise<ArticlePublishedStatus[]> {
     const articles = this.readConfigFile();
 
-    const articlePublishedStatuses = []
-    
+    const articlePublishedStatuses = [];
+
     // instead of using Promise.all we use a for with await
     // to run the updates one by one to avoid hammering dev.to API
     // and have more risks of being rate limited
