@@ -11,7 +11,7 @@ import {
   Repository,
   UpdateStatus,
 } from './dev-to-git.interface';
-import { formatArticlePublishedStatuses, logBuilder, Logger } from './helpers';
+import { Logger, formatArticlePublishedStatuses, logBuilder } from './helpers';
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
@@ -105,15 +105,18 @@ export class DevToGit {
     }));
   }
 
-  public publishArticles(): Promise<ArticlePublishedStatus[]> {
+  public async publishArticles(): Promise<ArticlePublishedStatus[]> {
     const articles = this.readConfigFile();
 
-    return Promise.all(
-      articles.map(articleConf => {
-        const article = new Article(articleConf, this.configuration.devToToken);
-        return article.publishArticle();
-      }),
-    );
+    const articlePublishedStatuses = []
+    
+    // instead of using Promise.all we use a for with await
+    // to run the updates one by one to avoid hammering dev.to API
+    // and have more risks of being rate limited
+    for (const articleConf of articles) {
+      const article = new Article(articleConf, this.configuration.devToToken);
+      articlePublishedStatuses.push(await article.publishArticle());
+    }
   }
 }
 
