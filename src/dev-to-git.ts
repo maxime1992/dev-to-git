@@ -83,9 +83,8 @@ export class DevToGit {
           'If you do not specify --repository-url, you must have within your "package.json" a "repository" attribute which is an object and contains itself an attribute "url" like the following: https://github-gitlab-whatever.com/username/repository-name.git - this will be used to generate images links if necessary',
         ),
       );
-      process.exit(1);
+      throw new Error();
     }
-    throw new Error('Should not be reached');
   }
 
   public getConfigPath(): string {
@@ -117,6 +116,8 @@ export class DevToGit {
       const article = new Article(articleConf, this.configuration.devToToken);
       articlePublishedStatuses.push(await article.publishArticle());
     }
+
+    return articlePublishedStatuses;
   }
 }
 
