@@ -5,7 +5,7 @@
   "keywords": [
     "dev.to"
   ],
-  "source": "src/dev-to-git.ts",
+  "source": "src/index.ts",
   "main": "bin/dev-to-git.umd.js",
   "module": "bin/dev-to-git.es5.js",
   "typings": "bin/types/dev-to-git.d.ts",
@@ -16,7 +16,7 @@
     "package.json"
   ],
   "bin": {
-    "dev-to-git": "bin/index.js"
+    "dev-to-git": "bin/dev-to-git.umd.js"
   },
   "author": "Maxime Robert <maxime.robert1992@gmail.com>",
   "repository": {
@@ -28,13 +28,12 @@
     "node": ">=18.16.0"
   },
   "scripts": {
-    "copy-index": "cp ./src/index.js ./bin",
     "prettier:base": "yarn run prettier \"./{src,test}/**/*.ts\" \"./**/*.{yml,md,json}\"",
     "prettier:fix": "yarn run prettier:base --write",
     "prettier:check": "yarn run prettier:base --check",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf bin",
-    "build": "tsc --module commonjs && parcel build && yarn run copy-index",
+    "build": "tsc --module commonjs && parcel build",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch --coverage",
     "test:prod": "npm run lint && npm run test -- --no-cache",
@@ -90,7 +89,6 @@
     "typescript": "5.1.3"
   },
   "dependencies": {
-    "chalk": "5.2.0",
     "commander": "11.0.0",
     "dotenv": "16.2.0",
     "front-matter": "4.0.2"

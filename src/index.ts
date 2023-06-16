@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-require('./dev-to-git.umd.js');
+import { DevToGit } from './dev-to-git';
+import { UpdateStatus } from './dev-to-git.interface';
+import { formatArticlePublishedStatuses } from './helpers';
 
 const devToGit = new DevToGit();
 
@@ -21,7 +23,7 @@ devToGit
     });
   })
   .catch(error => {
-    devToGit.logger(chalk.red(`An error occurred while publishing the articles`));
+    devToGit.logger(`An error occurred while publishing the articles`);
     console.error(error);
     process.exit(1);
   });
