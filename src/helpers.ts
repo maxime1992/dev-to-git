@@ -5,9 +5,7 @@ export const formatArticlePublishedStatuses = (articlePublishedStatuses: Article
   return articlePublishedStatuses
     .map(articleStatus => {
       if (articleStatus.updateStatus === UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER) {
-        return chalk.red(
-          `Article with ID "${articleStatus.articleId}" doesn't have a front matter correctly formatted`,
-        );
+        return `Article with ID "${articleStatus.articleId}" doesn't have a front matter correctly formatted`;
       }
 
       const baseText: string = `[${articleStatus.published ? 'PUBLISHED' : 'DRAFT'}] Article "${
@@ -17,22 +15,21 @@ export const formatArticlePublishedStatuses = (articlePublishedStatuses: Article
 
       switch (articleStatus.updateStatus) {
         case UpdateStatus.ALREADY_UP_TO_DATE as UpdateStatus.ALREADY_UP_TO_DATE:
-          text = chalk.blueBright(baseText + `is already up to date`);
+          text = baseText + `is already up to date`;
           break;
         case UpdateStatus.ERROR as UpdateStatus.ERROR:
-          text = chalk.redBright(
+          text =
             baseText +
-              `encountered an error:\n` +
-              `Error name: "${articleStatus.error.name}"\n` +
-              `Error message: "${articleStatus.error.message}"\n` +
-              `Error stack: "${articleStatus.error.stack}"`,
-          );
+            `encountered an error:\n` +
+            `Error name: "${articleStatus.error.name}"\n` +
+            `Error message: "${articleStatus.error.message}"\n` +
+            `Error stack: "${articleStatus.error.stack}"`;
           break;
         case UpdateStatus.UPDATED as UpdateStatus.UPDATED:
           if (articleStatus.published) {
-            text = chalk.greenBright(baseText + `has been successfully updated`);
+            text = baseText + `has been successfully updated`;
           } else {
-            text = chalk.yellowBright(baseText + `has been successfully updated`);
+            text = baseText + `has been successfully updated`;
           }
           break;
 

@@ -82,9 +82,7 @@ export class DevToGit {
       return repo;
     } catch (error) {
       this.logger(
-        chalk.red(
-          'If you do not specify --repository-url, you must have within your "package.json" a "repository" attribute which is an object and contains itself an attribute "url" like the following: https://github-gitlab-whatever.com/username/repository-name.git - this will be used to generate images links if necessary',
-        ),
+        'If you do not specify --repository-url, you must have within your "package.json" a "repository" attribute which is an object and contains itself an attribute "url" like the following: https://github-gitlab-whatever.com/username/repository-name.git - this will be used to generate images links if necessary',
       );
       throw new Error();
     }
