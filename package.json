@@ -5,6 +5,7 @@
   "keywords": [
     "dev.to"
   ],
+  "source": "src/dev-to-git.ts",
   "main": "bin/dev-to-git.umd.js",
   "module": "bin/dev-to-git.es5.js",
   "typings": "bin/types/dev-to-git.d.ts",
@@ -33,8 +34,7 @@
     "prettier:check": "yarn run prettier:base --check",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf bin",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src && yarn run copy-index",
-    "start": "rollup -c rollup.config.ts -w",
+    "build": "tsc --module commonjs && parcel build && yarn run copy-index",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
