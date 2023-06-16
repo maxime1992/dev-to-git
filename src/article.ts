@@ -1,6 +1,5 @@
 import extractFrontMatter from 'front-matter';
 import fs from 'fs';
-import got, { Response } from 'got';
 import {
   ArticleApi,
   ArticleApiResponse,
@@ -33,15 +32,17 @@ export class Article {
   // dev-to-git won't have more than 1000 articles for now
   // also note that we're using a property instead of a method here so that the result is
   // shared/reused for all the different articles with only 1 HTTP call
-  private getArticles(): Promise<Record<number, string>> {
-    return got(`https://dev.to/api/articles/me/all?per_page=1000`, {
-      json: true,
+  private async getArticles(): Promise<Record<number, string>> {
+    return fetch('https://dev.to/api/articles/me/all?per_page=1000', {
       method: 'GET',
-      headers: { 'api-key': this.token },
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': this.token,
+      },
     })
-      .json()
-      .then((res: Response<ArticleApiResponse[]>) =>
-        res.body.reduce<Record<number, string>>((articlesMap, article) => {
+      .then(res => res.json())
+      .then((res: ArticleApiResponse[]) =>
+        res.reduce<Record<number, string>>((articlesMap, article) => {
           articlesMap[article.id] = article.body_markdown;
           return articlesMap;
         }, {}),
@@ -126,13 +127,15 @@ export class Article {
       };
     }
 
-    return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
+    return fetch(`https://dev.to/api/articles/${this.articleConfig.id}`, {
       method: 'PUT',
-      headers: { 'api-key': this.token },
-      json: {
-        ...body,
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': this.token,
       },
+      body: JSON.stringify(body),
     })
+      .then(res => res.json())
       .then(() => ({
         articleId: this.articleConfig.id,
         articleTitle: frontMatter.title,

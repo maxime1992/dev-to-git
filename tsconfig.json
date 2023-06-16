@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDirs": ["src"],
     "outDir": "dist",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "target": "ES2022",
     "module": "ES2022",
     "composite": true,
@@ -13,12 +13,7 @@
     "esModuleInterop": true,
     "types": ["jest", "node", "@types/jest"],
     "sourceMap": true,
-    "resolveJsonModule": true,
-    // https://github.com/sindresorhus/got/issues/2267#issuecomment-1582075262
-    "paths": {
-      "~/*": ["./src/*"],
-      "got": ["./node_modules/got/dist/source"]
-    }
+    "resolveJsonModule": true
   },
   "ts-node": {
     "esm": true,
