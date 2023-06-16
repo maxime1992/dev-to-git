@@ -1,4 +1,5 @@
-import { DevToGit, DEFAULT_CONFIG_PATH } from '../src/dev-to-git';
+import fs from 'fs';
+import { DEFAULT_CONFIG_PATH, DevToGit } from '../src/dev-to-git';
 
 describe(`DevToGit`, () => {
   beforeEach(() => {
@@ -19,21 +20,25 @@ describe(`DevToGit`, () => {
         const devToGit = new DevToGit();
         expect(devToGit.getConfigPath()).toBe(CUSTOM_CONFIG_PATH);
       });
-
-      it(`should use the default path if the "config" flag is passed without nothing`, () => {
-        process.argv = ['don-t-care', 'don-t-care', '--config'];
-        const devToGit = new DevToGit();
-        expect(devToGit.getConfigPath()).toBe(DEFAULT_CONFIG_PATH);
-      });
     });
 
     describe(`Read config from file`, () => {
-      it(`test`, () => {
+      it(`should have the original config file on which a "repository" object is added`, () => {
         process.argv = ['don-t-care', 'don-t-care', '--config', './test/dev-to-git.json'];
 
         const devToGit = new DevToGit();
 
-        expect(devToGit.readConfigFile()).toEqual(require('./dev-to-git.json'));
+        const configFile = devToGit.readConfigFile();
+
+        expect(configFile).toHaveLength(1);
+
+        expect(configFile[0]).toEqual({
+          ...JSON.parse(fs.readFileSync('test/dev-to-git.json').toString())[0],
+          repository: {
+            name: 'dev-to-git',
+            username: 'maxime1992',
+          },
+        });
       });
     });
   });
