@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { program } from 'commander';
 import dotenv from 'dotenv';
 import fs from 'fs';
@@ -10,7 +9,7 @@ import {
   ConfigurationOptions,
   Repository,
 } from './dev-to-git.interface';
-import { Logger, logBuilder } from './helpers';
+import { Logger, logBuilder, readPackageJson } from './helpers';
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
@@ -21,13 +20,13 @@ export class DevToGit {
 
   public logger: Logger;
 
+  private pkg = readPackageJson();
+
   constructor() {
     dotenv.config();
 
-    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
-
     const prog = program
-      .version(pkg.version)
+      .version(this.pkg.version)
       .arguments('[...files]')
       .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
       .option('--dev-to-token <token>', 'Token for publishing to dev.to', process.env.DEV_TO_TOKEN)
@@ -71,9 +70,7 @@ export class DevToGit {
 
   private extractRepository(): Repository {
     try {
-      const packageJson = JSON.parse(fs.readFileSync('./package.json').toString());
-
-      const repo = this.parseRepository(packageJson.repository.url);
+      const repo = this.parseRepository(this.pkg.repository.url);
 
       if (!repo) {
         throw Error();

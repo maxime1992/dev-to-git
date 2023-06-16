@@ -1,4 +1,5 @@
-import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
 import { ArticlePublishedStatus, UpdateStatus } from './dev-to-git.interface';
 
 export const formatArticlePublishedStatuses = (articlePublishedStatuses: ArticlePublishedStatus[]): string => {
@@ -54,3 +55,7 @@ export const logBuilder = (silent: boolean): Logger => (...messages: string[]) =
     console.log(...messages);
   }
 };
+
+export function readPackageJson() {
+  return JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json')).toString());
+}
