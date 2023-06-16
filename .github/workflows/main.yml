@@ -26,6 +26,8 @@ jobs:
         run: yarn lint
       - name: Format check
         run: yarn prettier:check
+      - name: Test
+        run: yarn test
       - name: Build lib
         run: yarn build
       - name: Copy necessary files into bin
