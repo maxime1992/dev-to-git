@@ -1,15 +1,17 @@
-import { program } from 'commander';
+import { Command, OptionValues, program } from 'commander';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { Article } from './article';
 import {
+  ArticleApiResponse,
   ArticleConfig,
   ArticleConfigFile,
   ArticlePublishedStatus,
   ConfigurationOptions,
   Repository,
+  UpdateStatus,
 } from './dev-to-git.interface';
-import { Logger, logBuilder, readPackageJson } from './helpers';
+import { Logger, formatArticlePublishedStatuses, logBuilder, readPackageJson } from './helpers';
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
@@ -25,30 +27,90 @@ export class DevToGit {
   constructor() {
     dotenv.config();
 
-    const prog = program
-      .version(this.pkg.version)
-      .arguments('[...files]')
-      .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
-      .option('--dev-to-token <token>', 'Token for publishing to dev.to', process.env.DEV_TO_TOKEN)
-      .option('--repository-url <url>', 'Url of your repository you keep your articles in.')
-      .option('--silent', `No console output`)
-      .parse(process.argv);
+    const handleCommon = (opts: OptionValues) => {
+      this.logger = logBuilder(opts.silent);
 
-    const opts = prog.opts();
+      if (!opts.devToToken) {
+        this.logger('DEV_TO_TOKEN environment variable, or --dev-to-token argument is required');
+        process.exit(1);
+      }
 
-    this.logger = logBuilder(opts.silent);
-
-    if (!opts.devToToken) {
-      this.logger('DEV_TO_TOKEN environment variable, or --dev-to-token argument is required');
-      process.exit(1);
-    }
-
-    this.configuration = {
-      silent: opts.silent,
-      config: opts.config,
-      devToToken: opts.devToToken,
-      repository: this.parseRepository(opts.repository) || this.extractRepository(),
+      this.configuration = {
+        silent: opts.silent,
+        config: opts.config,
+        devToToken: opts.devToToken,
+        repository: this.parseRepository(opts.repository) || this.extractRepository(),
+      };
     };
+
+    const prog = program.version(this.pkg.version);
+
+    const sharedOptions = (command: Command) =>
+      command
+        .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
+        .option('--dev-to-token <token>', 'Token for publishing to dev.to', process.env.DEV_TO_TOKEN)
+        .option('--repository-url <url>', 'Url of your repository you keep your articles in.')
+        .option('--silent', `No console output`);
+
+    const publishCommand = prog.command('publish');
+    const retrieveCommand = prog.command('retrieve');
+
+    sharedOptions(publishCommand).action(() => {
+      const opts = publishCommand.opts();
+
+      handleCommon(opts);
+
+      this.publishArticles()
+        .then(articles => ({ articles, text: formatArticlePublishedStatuses(articles) }))
+        .then(res => {
+          this.logger(res.text);
+
+          res.articles.forEach(article => {
+            if (
+              article.updateStatus === UpdateStatus.ERROR ||
+              article.updateStatus === UpdateStatus.FAILED_TO_EXTRACT_FRONT_MATTER
+            ) {
+              // if there's been at least one error, exit and fail
+              process.exit(1);
+            }
+          });
+        })
+        .catch(error => {
+          this.logger(`An error occurred while publishing the articles`);
+          console.error(error);
+          process.exit(1);
+        });
+    });
+
+    sharedOptions(retrieveCommand).action(async () => {
+      const opts = retrieveCommand.opts();
+      handleCommon(opts);
+
+      const getArticles = async (): Promise<Record<number, string>> => {
+        return fetch('https://dev.to/api/articles/me/all?per_page=1000', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': this.configuration.devToToken,
+          },
+        })
+          .then(res => res.json())
+          .then((res: ArticleApiResponse[]) =>
+            res.reduce<Record<number, string>>((articlesMap, article) => {
+              articlesMap[article.id] = article.body_markdown;
+              return articlesMap;
+            }, {}),
+          );
+      };
+
+      const articles = await getArticles();
+
+      for (const article of Object.entries(articles)) {
+        fs.writeFileSync(`./blog-posts/${article[0]}.md`, article[1]);
+      }
+    });
+
+    prog.parse(process.argv);
   }
 
   private parseRepository(repo: string | null): Repository | null {

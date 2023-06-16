@@ -9,7 +9,7 @@ const config: JestConfigWithTsJest = {
     '^.+\\.(ts|tsx)?$': ['ts-jest', { useESM: true }]
   },
   testPathIgnorePatterns: ['./dist'],
-  moduleFileExtensions: ['ts', 'js', 'json']
+  moduleFileExtensions: ['ts', 'js', 'json'],
 }
 
 export default config
