@@ -1,5 +1,5 @@
-import { ArticlePublishedStatus, ConfigurationOptions, UpdateStatus } from './dev-to-git.interface';
 import chalk from 'chalk';
+import { ArticlePublishedStatus, UpdateStatus } from './dev-to-git.interface';
 
 export const formatArticlePublishedStatuses = (articlePublishedStatuses: ArticlePublishedStatus[]): string => {
   return articlePublishedStatuses
@@ -52,8 +52,8 @@ class UnreachabelCase {
 
 export type Logger = (...messages: string[]) => void;
 
-export const logBuilder = (options: ConfigurationOptions): Logger => (...messages: string[]) => {
-  if (!options.silent) {
+export const logBuilder = (silent: boolean): Logger => (...messages: string[]) => {
+  if (!silent) {
     console.log(...messages);
   }
 };

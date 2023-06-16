@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import program from 'commander';
+import { program } from 'commander';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { Article } from './article';
@@ -9,9 +9,8 @@ import {
   ArticlePublishedStatus,
   ConfigurationOptions,
   Repository,
-  UpdateStatus,
 } from './dev-to-git.interface';
-import { Logger, formatArticlePublishedStatuses, logBuilder } from './helpers';
+import { Logger, logBuilder } from './helpers';
 
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
@@ -25,9 +24,9 @@ export class DevToGit {
   constructor() {
     dotenv.config();
 
-    const pkg = require('../package.json');
+    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
 
-    program
+    const prog = program
       .version(pkg.version)
       .arguments('[...files]')
       .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
@@ -36,17 +35,21 @@ export class DevToGit {
       .option('--silent', `No console output`)
       .parse(process.argv);
 
-    const configuration: ConfigurationOptions = (program as unknown) as ConfigurationOptions;
-    this.configuration = configuration;
+    const opts = prog.opts();
 
-    this.logger = logBuilder(this.configuration);
+    this.logger = logBuilder(opts.silent);
 
-    this.configuration.repository = this.parseRepository(program.repositoryUrl) || this.extractRepository();
-
-    if (!this.configuration.devToToken) {
+    if (!opts.devToToken) {
       this.logger(chalk.red('DEV_TO_GIT_TOKEN environment variable, or --dev-to-token argument is required'));
       process.exit(1);
     }
+
+    this.configuration = {
+      silent: opts.silent,
+      config: opts.config,
+      devToToken: opts.devToToken,
+      repository: this.parseRepository(opts.repository) || this.extractRepository(),
+    };
   }
 
   private parseRepository(repo: string | null): Repository | null {
