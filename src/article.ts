@@ -25,24 +25,28 @@ interface ImageToReplace {
 }
 
 export class Article {
+  constructor(private articleConfig: ArticleConfig, private token: string) {}
+
   // dev.to API returns a maximum of 1000 articles but would by default return only 30
   // https://docs.dev.to/api/#tag/articles/paths/~1articles~1me~1all/get
   // instead of having to manage the pagination I think it's safe to assume people using
   // dev-to-git won't have more than 1000 articles for now
   // also note that we're using a property instead of a method here so that the result is
   // shared/reused for all the different articles with only 1 HTTP call
-  private articles: Promise<Record<number, string>> = got(`https://dev.to/api/articles/me/all?per_page=1000`, {
-    json: true,
-    method: 'GET',
-    headers: { 'api-key': this.token },
-  }).then((res: got.Response<ArticleApiResponse[]>) =>
-    res.body.reduce<Record<number, string>>((articlesMap, article) => {
-      articlesMap[article.id] = article.body_markdown;
-      return articlesMap;
-    }, {}),
-  );
-
-  constructor(private articleConfig: ArticleConfig, private token: string) {}
+  private getArticles(): Promise<Record<number, string>> {
+    return got(`https://dev.to/api/articles/me/all?per_page=1000`, {
+      json: true,
+      method: 'GET',
+      headers: { 'api-key': this.token },
+    })
+      .json()
+      .then((res: Response<ArticleApiResponse[]>) =>
+        res.body.reduce<Record<number, string>>((articlesMap, article) => {
+          articlesMap[article.id] = article.body_markdown;
+          return articlesMap;
+        }, {}),
+      );
+  }
 
   private updateLocalImageLinks(article: string): string {
     let searchImageResult;
@@ -97,7 +101,7 @@ export class Article {
     let remoteArticleBodyMarkdown: string | null | undefined;
 
     try {
-      const articles: Record<number, string> = await this.articles;
+      const articles: Record<number, string> = await this.getArticles();
       remoteArticleBodyMarkdown = articles[this.articleConfig.id] as string | null | undefined;
 
       if (remoteArticleBodyMarkdown === null || remoteArticleBodyMarkdown === undefined) {
