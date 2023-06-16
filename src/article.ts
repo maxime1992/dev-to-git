@@ -1,13 +1,13 @@
+import extractFrontMatter from 'front-matter';
+import fs from 'fs';
+import got, { Response } from 'got';
 import {
-  ArticleConfig,
   ArticleApi,
+  ArticleApiResponse,
+  ArticleConfig,
   ArticlePublishedStatus,
   UpdateStatus,
-  ArticleApiResponse,
 } from './dev-to-git.interface';
-import got from 'got';
-import fs from 'fs';
-import extractFrontMatter from 'front-matter';
 
 interface ArticleFrontMatter {
   title: string;
@@ -112,7 +112,7 @@ export class Article {
         updateStatus: UpdateStatus.ERROR as UpdateStatus.ERROR,
         articleId: this.articleConfig.id,
         articleTitle: frontMatter.title,
-        error,
+        error: error as Error,
         published: frontMatter.published,
       };
     }
@@ -127,10 +127,11 @@ export class Article {
     }
 
     return got(`https://dev.to/api/articles/${this.articleConfig.id}`, {
-      json: true,
       method: 'PUT',
       headers: { 'api-key': this.token },
-      body,
+      json: {
+        ...body,
+      },
     })
       .then(() => ({
         articleId: this.articleConfig.id,
