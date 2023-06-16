@@ -30,7 +30,7 @@ export class DevToGit {
       .version(pkg.version)
       .arguments('[...files]')
       .option('--config <path>', `Pass custom path to .dev-to-git.json file`, DEFAULT_CONFIG_PATH)
-      .option('--dev-to-token <token>', 'Token for publishing to dev.to', process.env.DEV_TO_GIT_TOKEN)
+      .option('--dev-to-token <token>', 'Token for publishing to dev.to', process.env.DEV_TO_TOKEN)
       .option('--repository-url <url>', 'Url of your repository you keep your articles in.')
       .option('--silent', `No console output`)
       .parse(process.argv);
@@ -40,7 +40,7 @@ export class DevToGit {
     this.logger = logBuilder(opts.silent);
 
     if (!opts.devToToken) {
-      this.logger(chalk.red('DEV_TO_GIT_TOKEN environment variable, or --dev-to-token argument is required'));
+      this.logger('DEV_TO_TOKEN environment variable, or --dev-to-token argument is required');
       process.exit(1);
     }
 

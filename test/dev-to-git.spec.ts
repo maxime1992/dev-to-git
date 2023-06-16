@@ -4,7 +4,7 @@ import { DEFAULT_CONFIG_PATH, DevToGit } from '../src/dev-to-git';
 describe(`DevToGit`, () => {
   beforeEach(() => {
     process.argv = ['don-t-care', 'don-t-care'];
-    process.env.DEV_TO_GIT_TOKEN = 'token';
+    process.env.DEV_TO_TOKEN = 'token';
   });
 
   describe(`Config`, () => {

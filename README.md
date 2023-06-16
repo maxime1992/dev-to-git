@@ -54,7 +54,7 @@ If you want to use Github and Travis, a `.travis.yml` file has been already prep
 
 First, you have to activate the repository on Travis: https://travis-ci.org/account/repositories
 
-Then, you have to create a token on your dev.to account: https://dev.to/settings/account and set an environment variable on Travis called `DEV_TO_GIT_TOKEN` that will have the newly created token as value.
+Then, you have to create a token on your dev.to account: https://dev.to/settings/account and set an environment variable on Travis called `DEV_TO_TOKEN` that will have the newly created token as value.
 
 # How can I manage my blog posts? Mono repo? One article per repo?
 
