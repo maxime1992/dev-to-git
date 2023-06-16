@@ -1,18 +1,28 @@
 {
   "compilerOptions": {
+    "rootDirs": ["src"],
+    "outDir": "dist",
+    "lib": ["ES2022"],
+    "target": "ES2022",
+    "module": "ES2022",
+    "composite": true,
     "moduleResolution": "node",
-    "target": "es5",
-    "module": "es2015",
-    "lib": ["es2015", "es2016", "es2017", "dom"],
-    "strict": true,
-    "sourceMap": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "declarationDir": "bin/types",
-    "outDir": "bin/lib",
-    "typeRoots": ["node_modules/@types"]
+    "declarationMap": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "types": ["jest", "node", "@types/jest"],
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    // https://github.com/sindresorhus/got/issues/2267#issuecomment-1582075262
+    "paths": {
+      "~/*": ["./src/*"],
+      "got": ["./node_modules/got/dist/source"]
+    }
   },
-  "include": ["src"]
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "include": ["package.json", "./src/**/*", "./tests/**/*"]
 }
