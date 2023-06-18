@@ -70,4 +70,78 @@ describe('MarkdownService', () => {
       );
     });
   });
+
+  describe('updateLocalImageLinks', () => {
+    it('should replace local image links', () => {
+      const res = service.updateLocalImageLinks(
+        `This is some text
+Then we insert a picture here
+![](./assets/pic1.jpg)
+And while we're here, let's test all the other possibilities to define an image
+![Some title here](./assets/pic2.jpg)
+![Some title here](./assets/pic3.jpg 'And another title here for hover')
+!['Some title here'](./assets/pic4.jpg 'And another title here for hover')`,
+        {
+          id: 1,
+          relativePathToArticle: './src/some-article',
+          repository: { username: 'maxime1992', name: 'dev-to-git' },
+        },
+      );
+
+      expect(res).toBe(`This is some text
+Then we insert a picture here
+![](https://raw.githubusercontent.com/maxime1992/dev-to-git/master/src/some-article/assets/pic1.jpg)
+And while we're here, let's test all the other possibilities to define an image
+![Some title here](https://raw.githubusercontent.com/maxime1992/dev-to-git/master/src/some-article/assets/pic2.jpg)
+![Some title here](https://raw.githubusercontent.com/maxime1992/dev-to-git/master/src/some-article/assets/pic3.jpg 'And another title here for hover')
+!['Some title here'](https://raw.githubusercontent.com/maxime1992/dev-to-git/master/src/some-article/assets/pic4.jpg 'And another title here for hover')`);
+    });
+
+    it('should not replace image links that are not local', () => {
+      const initialText = `This is some text
+Then we insert a picture here but this time with an HTTP link directly that shouldn't be modified
+![](https://test/assets/pic1.jpg)
+And while we're here, let's test all the other possibilities to define an image
+![Some title here](https://test/assets/pic2.jpg)
+![Some title here](https://test/assets/pic3.jpg 'And another title here for hover')
+!['Some title here'](https://test/assets/pic4.jpg 'And another title here for hover')`;
+
+      const res = service.updateLocalImageLinks(initialText, {
+        id: 1,
+        relativePathToArticle: './src/some-article',
+        repository: { username: 'maxime1992', name: 'dev-to-git' },
+      });
+
+      expect(res).toBe(initialText);
+    });
+
+    it('should be able to handle both local and non local images', () => {
+      const res = service.updateLocalImageLinks(
+        `This is some text
+Then we insert a picture here but this time with an HTTP link directly that shouldn't be modified
+![](https://test/assets/pic1.jpg)
+And while we're here, let's test all the other possibilities to define an image
+![Some title here](https://test/assets/pic2.jpg)
+![Some title here](https://test/assets/pic3.jpg 'And another title here for hover')
+!['Some title here'](https://test/assets/pic4.jpg 'And another title here for hover')
+But it's also handling local links just fine:
+![](./assets/pic1.jpg)`,
+        {
+          id: 1,
+          relativePathToArticle: './src/some-article',
+          repository: { username: 'maxime1992', name: 'dev-to-git' },
+        },
+      );
+
+      expect(res).toBe(`This is some text
+Then we insert a picture here but this time with an HTTP link directly that shouldn't be modified
+![](https://test/assets/pic1.jpg)
+And while we're here, let's test all the other possibilities to define an image
+![Some title here](https://test/assets/pic2.jpg)
+![Some title here](https://test/assets/pic3.jpg 'And another title here for hover')
+!['Some title here'](https://test/assets/pic4.jpg 'And another title here for hover')
+But it's also handling local links just fine:
+![](https://raw.githubusercontent.com/maxime1992/dev-to-git/master/src/some-article/assets/pic1.jpg)`);
+    });
+  });
 });
