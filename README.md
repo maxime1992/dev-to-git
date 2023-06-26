@@ -1,73 +1,65 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Dev.to git: One way publishing of your blog posts from a git repo to dev.to
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## First, what is dev.to?
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+https://dev.to is a free and open source blogging platform for developers.
 
-## Description
+> dev.to (or just DEV) is a platform where software developers write articles, take part in discussions, and build their professional profiles. We value supportive and constructive dialogue in the pursuit of great code and career growth for all members. The ecosystem spans from beginner to advanced developers, and all are welcome to find their place within our community.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Why would I want to put all my blog posts on a git repo?
 
-## Installation
+- Don't be afraid to mess up with one of your articles while editing it
+- Same good practices as when you're developing (format, commits, saving history, compare, etc)
+- Use prettier to format the markdown and all the code
+- Let people contribute to your article by creating a PR against it (tired of comments going sideways because of some typos? Just let people know they can make a PR at the end of your blog post)
+- Create code examples close to your blog post and make sure they're correct thanks to [Embedme](https://github.com/zakhenry/embedme) (_\*1_)
 
-```bash
-$ yarn install
+_\*1: Embedme allows you to write code in actual files rather than your readme, and then from your Readme to make sure that your examples are matching those files._
+
+If you prefer not to use Prettier or Embed me, you can do so by simply removing them but I think it's a nice thing to have!
+
+## How do I choose which files I want to publish?
+
+There's a `dev-to-git.json` file where you can define an array of blog posts, e.g.
+
+```json
+[
+  {
+    "id": 12345,
+    "relativePathToArticle": "./blog-posts/name-of-your-blog-post/name-of-your-blog-post.md"
+  }
+]
 ```
 
-## Running the app
+## How can I find the ID of my blog post on dev.to?
 
-```bash
-# development
-$ yarn run start
+Whether it's published or just a draft, you **have to create it** on dev.to directly. Unfortunately, dev.to does not display the ID of the blog post on the page. So once it's created, you can open your browser console and paste the following code to retrieve the blog post ID:  
+`+$('div[data-article-id]').getAttribute('data-article-id')`
 
-# watch mode
-$ yarn run start:dev
+## How do I configure every blog post individually?
 
-# production mode
-$ yarn run start:prod
-```
+A blog post has to have a [**front matter**](https://dev.to/p/editor_guide) header. You can find an example in this repository here: https://github.com/maxime1992/dev-to-git/blob/master/test/article.md
 
-## Test
+Simple and from there you have control over the following properties: `title`, `published`, `description`, `tags`, `series` and `canonical_url`.
 
-```bash
-# unit tests
-$ yarn run test
+## How do I add images to my blog posts?
 
-# e2e tests
-$ yarn run test:e2e
+Instead of uploading them manually on dev.to, simply put them within your git repo and within the blog post use a relative link. Here's an example: `The following is an image: ![alt text](./assets/image.png 'Title image')`.
 
-# test coverage
-$ yarn run test:cov
-```
+If you've got some plugin to preview your markdown from your IDE, the images will be correctly displayed. Then, on CI, right before they're published, the link will be updated to match the raw file.
 
-## Support
+## How to setup CI for auto deploying the blog posts?
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+If you want to use Github and Travis, a `.travis.yml` file has been already prepared for you.
 
-## Stay in touch
+First, you have to activate the repository on Travis: https://travis-ci.org/account/repositories
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Then, you have to create a token on your dev.to account: https://dev.to/settings/account and set an environment variable on Travis called `DEV_TO_TOKEN` that will have the newly created token as value.
 
-## License
+# How can I manage my blog posts? Mono repo? One article per repo?
 
-Nest is [MIT licensed](LICENSE).
+It's totally up to you and you could even adopt both solutions at the same time.
+
+You can have a repo with a single blog post, for example if you're presenting a library it might make sense to have the article written within that repo.
+
+And if you prefer a mono repo approach with all your articles in the same repo, I've built a template repository to help you get started in a few minutes only: https://github.com/maxime1992/dev.to
