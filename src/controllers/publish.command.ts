@@ -1,51 +1,54 @@
-import { Command, CommandRunner, Option } from 'nest-commander';
+import { ConfigService } from '@nestjs/config';
+import { Command, CommandRunner } from 'nest-commander';
+import {
+  TypedCommandRunner,
+  TypedOption,
+} from '../data/utils/commands/commands.utils';
 
 interface PublishCommandOptions {
   devToToken?: string;
-  config?: string;
   repositoryUrl?: string;
-  silent?: true;
+  silent?: boolean;
 }
 
 @Command({
   name: 'publish',
   options: { isDefault: false },
 })
-export class PublishCommand extends CommandRunner {
+export class PublishCommand
+  extends CommandRunner
+  implements TypedCommandRunner<PublishCommandOptions>
+{
+  constructor(private configService: ConfigService) {
+    super();
+  }
+
   async run(inputs: string[], options: PublishCommandOptions): Promise<void> {
     return;
   }
 
-  @Option({
-    flags: '--config <path>',
-    description: 'Pass custom path to .dev-to-git.json file',
-    defaultValue: './dev-to-git.json',
-  })
-  optionConfig(val: string): string {
-    return val;
-  }
-
-  @Option({
-    flags: '--dev-to-token <token>',
+  @TypedOption<PublishCommandOptions, 'devToToken'>({
+    flags: ['--dev-to-token', '<token>'],
     description: 'Token for publishing to dev.to',
   })
   optionDevToToken(val: string): string {
     return val;
   }
 
-  @Option({
-    flags: '--repository-url <url>',
+  @TypedOption<PublishCommandOptions, 'repositoryUrl'>({
+    flags: ['--repository-url', '<url>'],
     description: 'Url of your repository you keep your articles in',
   })
   optionRepositoryUrl(val: string): string {
     return val;
   }
 
-  @Option({
-    flags: '--silent',
+  @TypedOption<PublishCommandOptions, 'silent'>({
+    flags: ['--silent', '<boolean>'],
     description: 'No console output',
+    defaultValue: false,
   })
-  optionSilent(): void {
+  optionSilent(): boolean {
     return;
   }
 }
