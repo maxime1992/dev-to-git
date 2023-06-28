@@ -25,6 +25,7 @@
     "axios": "1.4.0",
     "dotenv": "16.3.1",
     "front-matter": "4.0.2",
+    "literal-case": "1.0.0",
     "nest-commander": "3.8.0",
     "reflect-metadata": "0.1.13",
     "rxjs": "7.8.1"

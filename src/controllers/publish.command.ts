@@ -1,9 +1,11 @@
 import { ConfigService } from '@nestjs/config';
+import { camelCase } from 'literal-case';
 import { Command, CommandRunner } from 'nest-commander';
 import {
   TypedCommandRunner,
   TypedOption,
 } from '../data/utils/commands/commands.utils';
+import { getEnvOptions } from '../data/utils/env';
 
 interface PublishCommandOptions {
   devToToken?: string;
@@ -24,6 +26,24 @@ export class PublishCommand
   }
 
   async run(inputs: string[], options: PublishCommandOptions): Promise<void> {
+    const optionsFromEnv = getEnvOptions<PublishCommandOptions>({
+      DEV_TO_TOKEN: true,
+      REPOSITORY_URL: true,
+      SILENT: true,
+    }).reduce((acc, e) => {
+      const a = this.configService.get(e);
+      if (a !== null && a !== undefined) {
+        acc[camelCase(e)] = a;
+      }
+      return acc;
+    }, {});
+
+    // merge conf from the command and the .env
+    const config: PublishCommandOptions = {
+      ...optionsFromEnv,
+      ...options,
+    };
+
     return;
   }
 
@@ -48,7 +68,7 @@ export class PublishCommand
     description: 'No console output',
     defaultValue: false,
   })
-  optionSilent(): boolean {
-    return;
+  optionSilent(val: string | boolean): boolean {
+    return val === true || val === 'true';
   }
 }

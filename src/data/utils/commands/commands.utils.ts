@@ -1,5 +1,6 @@
+import type { KebabCase } from 'literal-case';
 import { Option } from 'nest-commander';
-import type { InverseCapitalize, Kebab } from '../types';
+import type { InverseCapitalize } from '../types';
 
 type RemapPropsAsOptions<CustomType> = {
   [k in keyof CustomType]: `option${Capitalize<string & k>}`;
@@ -23,7 +24,7 @@ export type TypedCommandRunner<CustomType> = {
 export type TypeKeyToKebab<
   CustomType,
   K extends keyof CustomType,
-> = K extends string ? Kebab<K> : never;
+> = K extends string ? KebabCase<K> : never;
 
 export function typeSafeFlags<CustomType, T extends keyof CustomType>(
   command: `--${TypeKeyToKebab<CustomType, T>}`,
