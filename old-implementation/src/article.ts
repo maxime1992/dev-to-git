@@ -13,8 +13,8 @@ interface ArticleFrontMatter {
   published: boolean;
 }
 
-const imagesRe: RegExp = /\!\[.*\]\(\.\/.*\)/g;
-const imageRe: RegExp = /\!\[(.*)\]\(([^ \)]*)(?: '(.*)')?\)/;
+const imagesRe = /\!\[.*\]\(\.\/.*\)/g;
+const imageRe = /\!\[(.*)\]\(([^ \)]*)(?: '(.*)')?\)/;
 
 const excludeArticleFromPath = (path: string): string => path.replace(/\/[^\/]+\.md$/, '');
 
@@ -51,7 +51,7 @@ export class Article {
 
   private updateLocalImageLinks(article: string): string {
     let searchImageResult;
-    let localImagesToReplace: ImageToReplace[] = [];
+    const localImagesToReplace: ImageToReplace[] = [];
 
     // tslint:disable-next-line: no-conditional-assignment
     while ((searchImageResult = imagesRe.exec(article))) {
@@ -78,11 +78,13 @@ export class Article {
     );
   }
 
+  // todo
   public readArticleOnDisk(): string {
     const article = fs.readFileSync(this.articleConfig.relativePathToArticle).toString();
     return this.updateLocalImageLinks(article);
   }
 
+  // todo
   public async publishArticle(): Promise<ArticlePublishedStatus> {
     const body: ArticleApi = {
       article: { body_markdown: this.readArticleOnDisk() },
