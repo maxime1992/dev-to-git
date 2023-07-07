@@ -28,12 +28,15 @@ export class PublishCommand
       REPOSITORY_URL: true,
       SILENT: true,
     }).reduce((acc, e) => {
+      if (!e) {
+        return acc;
+      }
       const a = this.configService.get(e);
       if (a !== null && a !== undefined) {
         acc[camelCase(e)] = a;
       }
       return acc;
-    }, {});
+    }, {} as Partial<PublishCommandOptions>);
 
     // merge conf from the command and the .env
     const config: PublishCommandOptions = {

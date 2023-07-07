@@ -21,6 +21,10 @@ export class DevToInterceptor extends AxiosInterceptor {
 
   public requestFulfilled(): AxiosFulfilledInterceptor<AxiosRequestConfig> {
     return (config) => {
+      if (!config.baseURL) {
+        throw new Error(`Intercepted a request which doens't have a base URL`);
+      }
+
       if (config.baseURL.startsWith('https://dev.to/api')) {
         if (!config.headers) {
           config.headers = new AxiosHeaders({ 'api-key': this.devToToken });

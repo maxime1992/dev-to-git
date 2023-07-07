@@ -39,13 +39,13 @@ describe('DevTo interceptor', () => {
 
     it(`should add an api-key header if the request is for dev.to API`, async () => {
       expect(
-        (await configCallback({ baseURL: 'https://dev.to/api' })).headers[
+        (await configCallback({ baseURL: 'https://dev.to/api' })).headers?.[
           'api-key'
         ],
       ).toBe(MOCK_DEV_TO_TOKEN);
       expect(
         (await configCallback({ baseURL: 'https://dev.to/api/anything/else' }))
-          .headers['api-key'],
+          .headers?.['api-key'],
       ).toBe(MOCK_DEV_TO_TOKEN);
     });
   });
