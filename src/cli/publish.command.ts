@@ -1,14 +1,13 @@
-import { ConfigService } from '@nestjs/config';
+import { ConfigService as NestConfigService } from '@nestjs/config';
 import { camelCase } from 'literal-case';
 import { Command, CommandRunner } from 'nest-commander';
-import { getEnvOptions } from './utils/environment-options.utils';
+import { ConfigurationService } from '../services/configuration/configuration.service';
+import {
+  fromPublishCommandOptionsToConfiguration,
+  getEnvOptions,
+} from './utils/environment-options.utils';
+import { PublishCommandOptions } from './utils/publish-command.interface';
 import { TypedCommandRunner, TypedOption } from './utils/typed-commands.utils';
-
-interface PublishCommandOptions {
-  devToToken?: string;
-  repositoryUrl?: string;
-  silent?: boolean;
-}
 
 @Command({
   name: 'publish',
@@ -18,7 +17,10 @@ export class PublishCommand
   extends CommandRunner
   implements TypedCommandRunner<PublishCommandOptions>
 {
-  constructor(private configService: ConfigService) {
+  constructor(
+    private nestConfigService: NestConfigService,
+    private configurationService: ConfigurationService,
+  ) {
     super();
   }
 
@@ -31,7 +33,7 @@ export class PublishCommand
       if (!e) {
         return acc;
       }
-      const a = this.configService.get(e);
+      const a = this.nestConfigService.get(e);
       if (a !== null && a !== undefined) {
         acc[camelCase(e)] = a;
       }
@@ -43,6 +45,10 @@ export class PublishCommand
       ...optionsFromEnv,
       ...options,
     };
+
+    this.configurationService.set(
+      fromPublishCommandOptionsToConfiguration(config),
+    );
 
     return;
   }

@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 import { PublishCommand } from './cli/publish.command';
 import { ArticlesService } from './services/articles/articles.service';
+import { ConfigurationService } from './services/configuration/configuration.service';
 import { CWD_PROVIDER } from './services/cwd/cwd.provider';
 
 @Module({
@@ -13,6 +14,11 @@ import { CWD_PROVIDER } from './services/cwd/cwd.provider';
       envFilePath: path.resolve(process.cwd(), 'dev-to-git.env'),
     }),
   ],
-  providers: [ArticlesService, PublishCommand, CWD_PROVIDER],
+  providers: [
+    CWD_PROVIDER,
+    ArticlesService,
+    PublishCommand,
+    ConfigurationService,
+  ],
 })
 export class AppModule {}
