@@ -2,7 +2,7 @@ import { AxiosFulfilledInterceptor } from '@narando/nest-axios-interceptor';
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { AxiosRequestConfig } from 'axios';
-import { DEV_TO_TOKEN } from '../data/dev-to/dev-to.tokens';
+import { DEV_TO_TOKEN } from '../../data/dev-to/dev-to.tokens';
 import { DevToInterceptor } from './dev-to.interceptor';
 
 describe('DevTo interceptor', () => {

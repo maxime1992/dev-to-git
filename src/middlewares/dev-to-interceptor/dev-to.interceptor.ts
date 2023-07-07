@@ -5,7 +5,10 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
 import { AxiosHeaders, type AxiosRequestConfig } from 'axios';
-import { DEV_TO_TOKEN, DEV_TO_TOKEN_TYPE } from '../data/dev-to/dev-to.tokens';
+import {
+  DEV_TO_TOKEN,
+  DEV_TO_TOKEN_TYPE,
+} from '../../data/dev-to/dev-to.tokens';
 
 @Injectable()
 export class DevToInterceptor extends AxiosInterceptor {
