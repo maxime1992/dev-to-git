@@ -2,7 +2,7 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
-import { PublishCommand } from './controllers/publish.command';
+import { PublishCommand } from './cli/publish.command';
 import { ArticlesService } from './data/dev-to/articles/articles.service';
 import {
   CURRENT_WORKING_DIRECTORY,
