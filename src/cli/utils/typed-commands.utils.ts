@@ -1,6 +1,8 @@
 import type { KebabCase } from 'literal-case';
 import { Option } from 'nest-commander';
-import type { InverseCapitalize } from '../../data/utils/types';
+
+type InverseCapitalize<S extends string> =
+  S extends `${infer First}${infer Rest}` ? `${Lowercase<First>}${Rest}` : S;
 
 type RemapPropsAsOptions<CustomType> = {
   [k in keyof CustomType]: `option${Capitalize<string & k>}`;
