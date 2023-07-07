@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import {
   ArticleApiResponse,
   ArticleId,
-} from '../data/dev-to/articles/articles.interface';
+} from '../../data/dev-to/articles/articles.interface';
 
 @Injectable()
 export class ArticlesService {
