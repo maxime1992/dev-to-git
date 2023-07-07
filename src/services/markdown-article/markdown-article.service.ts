@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ArticleConfig } from '../../data/article-configuration/article-configuration.types';
 import { FrontMatterServiceBase } from '../front-matter/front-matter.interfaces';
-import { ArticleFrontMatter } from './markdown.interfaces';
+import {
+  ArticleFrontMatter,
+  MarkdownArticleConfig,
+} from './markdown-article.interfaces';
 
 interface ImageToReplace {
   localImage: string;
@@ -15,7 +17,7 @@ const excludeArticleFromPath = (path: string): string =>
   path.replace(/\/[^\/]+\.md$/, '');
 
 @Injectable()
-export class MarkdownService {
+export class MarkdownArticleService {
   constructor(private frontMatterService: FrontMatterServiceBase) {}
 
   public extractDataFromFrontMatter(text: string): ArticleFrontMatter {
@@ -38,7 +40,7 @@ export class MarkdownService {
 
   public updateLocalImageLinks(
     text: string,
-    articleConfig: ArticleConfig,
+    articleConfig: MarkdownArticleConfig,
   ): string {
     let searchImageResult;
     const localImagesToReplace: ImageToReplace[] = [];

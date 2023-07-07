@@ -3,9 +3,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 import { PublishCommand } from './cli/publish.command';
-import { ArticlesService } from './services/articles/articles.service';
 import { ConfigurationService } from './services/configuration/configuration.service';
 import { CWD_PROVIDER } from './services/cwd/cwd.provider';
+import { ArticlesService } from './services/devto/articles.service';
 
 @Module({
   imports: [

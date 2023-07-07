@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FrontMatterServiceBase } from '../front-matter/front-matter.interfaces';
-import { MarkdownService } from './markdown.service';
+import { MarkdownArticleService } from './markdown-article.service';
 
-describe('MarkdownService', () => {
-  let service: MarkdownService;
+describe('MarkdownArticleService', () => {
+  let service: MarkdownArticleService;
 
   let extractFrontMatterMock: jest.Mock;
 
@@ -18,11 +18,11 @@ describe('MarkdownService', () => {
             extractFrontMatter: extractFrontMatterMock,
           }),
         },
-        MarkdownService,
+        MarkdownArticleService,
       ],
     }).compile();
 
-    service = module.get(MarkdownService);
+    service = module.get(MarkdownArticleService);
   });
 
   describe('extractDataFromFrontMatter', () => {
