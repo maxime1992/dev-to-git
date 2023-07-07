@@ -1,7 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { ArticleApiResponse, ArticleId } from './articles.interface';
+import {
+  ArticleApiResponse,
+  ArticleId,
+} from '../data/dev-to/articles/articles.interface';
 
 @Injectable()
 export class ArticlesService {
@@ -16,7 +19,7 @@ export class ArticlesService {
   public getArticles(): Observable<ArticleApiResponse[]> {
     return this.httpService
       .get<ArticleApiResponse[]>(`${this.baseUrl}/me/all?per_page=1000`)
-      .pipe(map(x => x.data));
+      .pipe(map((x) => x.data));
   }
 
   public updateArticle(articleId: ArticleId, articleContent: string) {
