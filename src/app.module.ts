@@ -2,7 +2,6 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
-import { AppService } from './app.service';
 import { PublishCommand } from './controllers/publish.command';
 import { ArticlesService } from './data/dev-to/articles/articles.service';
 import {
@@ -18,7 +17,6 @@ import {
     }),
   ],
   providers: [
-    AppService,
     ArticlesService,
     PublishCommand,
     {
