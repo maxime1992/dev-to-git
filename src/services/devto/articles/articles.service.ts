@@ -1,10 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import {
-  ArticleApiResponse,
-  ArticleId,
-} from '../../data/dev-to/articles/articles.interface';
+import { ArticleApiResponse, ArticleId } from './articles.interface';
 
 @Injectable()
 export class ArticlesService {

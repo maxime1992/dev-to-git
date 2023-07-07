@@ -5,7 +5,7 @@ import * as path from 'path';
 import { PublishCommand } from './cli/publish.command';
 import { ConfigurationService } from './services/configuration/configuration.service';
 import { CWD_PROVIDER } from './services/cwd/cwd.provider';
-import { ArticlesService } from './services/devto/articles.service';
+import { ArticlesService } from './services/devto/articles/articles.service';
 
 @Module({
   imports: [
