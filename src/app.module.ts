@@ -4,10 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 import { PublishCommand } from './cli/publish.command';
 import { ArticlesService } from './data/dev-to/articles/articles.service';
-import {
-  CURRENT_WORKING_DIRECTORY,
-  CURRENT_WORKING_DIRECTORY_TYPE,
-} from './data/utils/files';
+import { CWD_PROVIDER } from './services/cwd.provider';
 
 @Module({
   imports: [
@@ -16,13 +13,6 @@ import {
       envFilePath: path.resolve(process.cwd(), 'dev-to-git.env'),
     }),
   ],
-  providers: [
-    ArticlesService,
-    PublishCommand,
-    {
-      provide: CURRENT_WORKING_DIRECTORY,
-      useFactory: (): CURRENT_WORKING_DIRECTORY_TYPE => process.cwd(),
-    },
-  ],
+  providers: [ArticlesService, PublishCommand, CWD_PROVIDER],
 })
 export class AppModule {}
