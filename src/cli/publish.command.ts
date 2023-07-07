@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { camelCase } from 'literal-case';
 import { Command, CommandRunner } from 'nest-commander';
-import { getEnvOptions } from '../data/utils/env';
+import { getEnvOptions } from './utils/environment-options.utils';
 import { TypedCommandRunner, TypedOption } from './utils/typed-commands.utils';
 
 interface PublishCommandOptions {
