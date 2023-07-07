@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ArticleConfig } from '../article-configuration/article-configuration.types';
-import { FrontMatterServiceBase } from '../front-matter/front-matter.service';
+import { ArticleConfig } from '../data/article-configuration/article-configuration.types';
+import { FrontMatterServiceBase } from './front-matter.interfaces';
 import { ArticleFrontMatter } from './markdown.interfaces';
 
 interface ImageToReplace {

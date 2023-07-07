@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FrontMatterServiceBase } from '../front-matter/front-matter.service';
+import { FrontMatterServiceBase } from './front-matter.interfaces';
 import { MarkdownService } from './markdown.service';
 
 describe('MarkdownService', () => {
