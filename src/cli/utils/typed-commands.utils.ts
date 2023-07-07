@@ -1,6 +1,6 @@
 import type { KebabCase } from 'literal-case';
 import { Option } from 'nest-commander';
-import type { InverseCapitalize } from '../types';
+import type { InverseCapitalize } from '../../data/utils/types';
 
 type RemapPropsAsOptions<CustomType> = {
   [k in keyof CustomType]: `option${Capitalize<string & k>}`;
