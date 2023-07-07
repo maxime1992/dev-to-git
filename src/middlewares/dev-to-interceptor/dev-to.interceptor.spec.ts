@@ -2,7 +2,7 @@ import { AxiosFulfilledInterceptor } from '@narando/nest-axios-interceptor';
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { AxiosRequestConfig } from 'axios';
-import { DEV_TO_TOKEN } from '../../data/dev-to/dev-to.tokens';
+import { ConfigurationService } from '../../services/configuration/configuration.service';
 import { DevToInterceptor } from './dev-to.interceptor';
 
 describe('DevTo interceptor', () => {
@@ -14,11 +14,16 @@ describe('DevTo interceptor', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         { provide: HttpService, useValue: jest.fn() },
-        { provide: DEV_TO_TOKEN, useValue: MOCK_DEV_TO_TOKEN },
+        ConfigurationService,
         DevToInterceptor,
       ],
     }).compile();
 
+    module.get(ConfigurationService).set({
+      devToToken: MOCK_DEV_TO_TOKEN,
+      repositoryUrl: 'mock-repository-url',
+      silent: false,
+    });
     service = module.get(DevToInterceptor);
   });
 
