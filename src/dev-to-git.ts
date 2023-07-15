@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import program from 'commander';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import throttledQueue from 'throttled-queue';
 import { Article } from './article';
 import {
   ArticleConfig,
@@ -16,9 +17,11 @@ import { Logger, formatArticlePublishedStatuses, logBuilder } from './helpers';
 export const DEFAULT_CONFIG_PATH: string = './dev-to-git.json';
 
 const repositoryRe: RegExp = /.*\/(.*)\/(.*)\.git/;
+const ARTICLE_UPLOAD_INTERVAL = 3000;
 
 export class DevToGit {
   private configuration: ConfigurationOptions;
+  private queue: ReturnType<typeof throttledQueue>;
 
   public logger: Logger;
 
@@ -47,6 +50,8 @@ export class DevToGit {
       this.logger(chalk.red('DEV_TO_GIT_TOKEN environment variable, or --dev-to-token argument is required'));
       process.exit(1);
     }
+
+    this.queue = throttledQueue(1, ARTICLE_UPLOAD_INTERVAL);
   }
 
   private parseRepository(repo: string | null): Repository | null {
@@ -107,14 +112,17 @@ export class DevToGit {
   public async publishArticles(): Promise<ArticlePublishedStatus[]> {
     const articles = this.readConfigFile();
 
-    const articlePublishedStatuses = [];
+    const articlePublishedStatuses: ArticlePublishedStatus[] = [];
 
     // instead of using Promise.all we use a for with await
     // to run the updates one by one to avoid hammering dev.to API
     // and have more risks of being rate limited
     for (const articleConf of articles) {
       const article = new Article(articleConf, this.configuration.devToToken);
-      articlePublishedStatuses.push(await article.publishArticle());
+
+      await this.queue(async () => {
+        articlePublishedStatuses.push(await article.publishArticle());
+      });
     }
 
     return articlePublishedStatuses;
